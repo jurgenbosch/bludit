@@ -34,4 +34,31 @@ class Categories extends dbList {
 
 		return $this->save();
 	}
+
+    // Returns an array with a list of key of pages, FALSE if out of range
+    // The database is sorted by date or by position
+    // (int) $pageNumber, the page number
+    // (int) $numberOfItems, amount of items to return, if -1 returns all the items
+    public function getList($pageNumber, $numberOfItems)
+    {
+        $db = array_keys($this->db);
+
+        if ($numberOfItems==-1) {
+            return $db;
+        }
+
+        // The first page number is 1, so the real is 0
+        $realPageNumber = $pageNumber - 1;
+
+        $total = count($db);
+        $init = (int) $numberOfItems * $realPageNumber;
+        $end  = (int) min( ($init + $numberOfItems - 1), $total );
+        $outrange = $init<0 ? true : $init>$end;
+
+        if (!$outrange) {
+            return array_slice($db, $init, $numberOfItems, true);
+        }
+
+        return false;
+    }
 }
